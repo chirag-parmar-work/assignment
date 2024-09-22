@@ -30,6 +30,7 @@ model Event {
   name         String
   description   String?
   start_date    DateTime    
+  metadata      Json?
   user          User     @relation("UserEvents", fields: [user_id], references: [id])
   user_id       String   // Many-to-One: Event to User
   visitor       Visitor? @relation("EventVisitors", fields: [visitor_id], references: [id]) // Many-to-One relationship with Visitor

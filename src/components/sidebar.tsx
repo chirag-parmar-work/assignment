@@ -1,9 +1,8 @@
 "use client";
 import Image from "next/image";
 import logo from "../../public/logo.svg";
-import profile from "../../public/profile.svg";
-import Link from "next/link";
-import { HomeIcon, UserIcon } from "@heroicons/react/24/outline";
+
+import { CalendarDaysIcon, FolderIcon, FunnelIcon, HomeIcon, UserIcon } from "@heroicons/react/24/outline";
 import { useState } from "react";
 
 const menuItems = [
@@ -17,19 +16,19 @@ const menuItems = [
     name: "Funnels",
     href: "#",
     current: false,
-    icon: <HomeIcon className="mr-4 h-5 w-5" />,
+    icon: <FunnelIcon className="mr-4 h-5 w-5" />,
   },
   {
     name: "Leads",
     href: "#",
     current: false,
-    icon: <HomeIcon className="mr-4 h-5 w-5" />,
+    icon: <CalendarDaysIcon className="mr-4 h-5 w-5" />,
   },
   {
     name: "Segments",
     href: "#",
     current: false,
-    icon: <HomeIcon className="mr-4 h-5 w-5" />,
+    icon: <FolderIcon className="mr-4 h-5 w-5" />,
   },
   {
     name: "Workflows",

@@ -21,7 +21,7 @@ export const  InfoIcon = ({height=16 ,width=16}:{height?:number,width?:number}) 
 }
 
 const StatusMessage = ({ status }: { status: string }) => {
-   
+
   const getStatusConfig = () => {
     switch (status) {
       case 'checking':

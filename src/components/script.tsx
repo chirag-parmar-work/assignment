@@ -21,7 +21,7 @@ export const ScriptSnippet = () => {
          j.src = 'https://chirag-parmar-work.github.io/test/tag.js?id=' + i + dl;
         f.parentNode.insertBefore(j, f);
       })(window, document, 'script', 'surface', '${SurfaceId}');
-    </script>`;
+</script>`;
   
     const copyToClipboard = async () => {
       try {
@@ -43,7 +43,7 @@ export const ScriptSnippet = () => {
         <button
           onClick={copyToClipboard}
           
-          className="absolute right-[45px] top-[6px] mt-4 rounded-lg bg-blue-600 px-4 py-1.5 text-white"
+          className="absolute text-[14px] right-[45px] top-[6px] mt-4 rounded-lg bg-blue-600 px-4 py-1.5 text-white"
         >
          { copied ? "Copied" : "Copy Snippet" }
          
