@@ -3,7 +3,7 @@ const API_BASE_URL = "/api";
 async function apiRequest<T>(
   endpoint: string,
   options: RequestInit = {},
-): Promise<{ result: T; status: number }> {
+): Promise<T | undefined> {
   const url = `${API_BASE_URL}${endpoint}`;
 
   try {
@@ -21,12 +21,8 @@ async function apiRequest<T>(
       console.log(`API Error: ${response.status} - ${errorText}`);
     //   throw new Error(`API Error: ${response.status} - ${errorText}`);
     }
-
-
-    return {
-      result: await response.json(),
-      status: response.status
-    };
+    const responseData: T = await response.json();
+    return responseData;
   } catch (error) {
     if (error instanceof Error) {
       console.log(`API Request failed: ${error.message}`);

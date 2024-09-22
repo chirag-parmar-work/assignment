@@ -105,11 +105,7 @@ export default function Sidebar() {
       </nav>
       <div className="absolute bottom-0 left-0 right-0 p-4">
         <div className="flex items-center">
-          <img
-            className="h-10 w-10 rounded-full"
-            src="/api/placeholder/40/40"
-            alt="User avatar"
-          />
+         
           <div className="ml-3">
             <p className="text-sm font-medium">Chris Hood</p>
             <p className="text-xs text-gray-500">hello@example.com</p>

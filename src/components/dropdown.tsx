@@ -4,8 +4,8 @@ import StatusMessage, { AlertCircle, CheckCircle, InfoIcon } from "./status-mess
 
 const DefaultIcon=()=>{
   return <svg width="24" height="25" viewBox="0 0 24 25" fill="none" xmlns="http://www.w3.org/2000/svg">
-  <rect y="0.5" width="24" height="24" rx="12" fill="#2F64EE" fill-opacity="0.1"/>
-  <path d="M10.8001 14.4033L16.3153 8.88745L17.1643 9.73585L10.8001 16.1001L6.98169 12.2817L7.83009 11.4333L10.8001 14.4033Z" fill="#2F64EE" fill-opacity="0.29"/>
+  <rect y="0.5" width="24" height="24" rx="12" fill="#2F64EE" fillOpacity="0.1"/>
+  <path d="M10.8001 14.4033L16.3153 8.88745L17.1643 9.73585L10.8001 16.1001L6.98169 12.2817L7.83009 11.4333L10.8001 14.4033Z" fill="#2F64EE" fillOpacity="0.29"/>
   </svg>
   
 }

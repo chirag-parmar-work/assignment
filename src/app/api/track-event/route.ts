@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { PrismaClient} from "@prisma/client";
+import { eventEmitter } from "../event-sse/helper";
 
 const prisma = new PrismaClient();
 
@@ -17,8 +18,16 @@ interface EventBody {
   surfaceId: string;
   metadata: EventMetadata;
 }
+export async function GET() {
+  const events = await prisma.event.findMany();
+ 
+  return NextResponse.json({ events }, { status: 200 });
+  // ... rest of the function
+}
 
 export async function POST(request: NextRequest) {
+
+
   try {
     const { eventName, visitorId, surfaceId, metadata }: EventBody =
       await request.json();
@@ -104,7 +113,7 @@ export const createEvent = async ({
     description,
   } = metadata;
   
-    await prisma.event.create({
+   const data = await prisma.event.create({
       data: {
         name:eventName,
         description,
@@ -121,5 +130,7 @@ export const createEvent = async ({
         },
       },
     });
+   
+    eventEmitter.emit('newEvent', data);
+
   };
-  
