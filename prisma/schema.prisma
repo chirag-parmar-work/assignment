@@ -10,11 +10,38 @@ datasource db {
     url      = env("DATABASE_URL")
 }
 
-model Post {
-    id        Int      @id @default(autoincrement())
-    name      String
-    createdAt DateTime @default(now())
-    updatedAt DateTime @updatedAt
+enum user_status {
+  ACTIVE
+  PENDING
+}
 
-    @@index([name])
+model User {
+  id           String    @id @default(uuid())
+  name         String
+  surface_id   String    @unique
+  status       user_status
+  email        String    @unique
+  events       Event[]   @relation("UserEvents") // One-to-Many: User to Events
+  visitors     Visitor[]  @relation("UserVisitors") // One-to-Many: User to Visitors
+}
+
+model Event {
+  id            String   @id @default(uuid())
+  name         String
+  description   String?
+  start_date    DateTime    
+  user          User     @relation("UserEvents", fields: [user_id], references: [id])
+  user_id       String   // Many-to-One: Event to User
+  visitor       Visitor? @relation("EventVisitors", fields: [visitor_id], references: [id]) // Many-to-One relationship with Visitor
+  visitor_id    String?  // Optional: Link to Visitor
+}
+
+model Visitor {
+  id            String   @id @default(uuid())
+  name          String?
+  company_size  String?   
+  email         String?  @unique
+  events        Event[]  @relation("EventVisitors")
+  user          User    @relation("UserVisitors", fields: [user_id], references: [id]) 
+  user_id       String
 }
