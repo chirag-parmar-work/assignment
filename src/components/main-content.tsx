@@ -28,55 +28,62 @@ export default function MainContent() {
   const [opendropdown, setOpenDropdown] = useState<string>("");
 
 
-  // useEffect(() => {
-  //   const fetchEvents = async () => {
-  //     try {
-  //       const response = await apiRequest<{ events: Event[], status: number }>('/track-event?userId=U-123123');
-  //       if (response?.status === 200 && response.result) {
-  //         setEvents(response.result);
-  //       }
-  //     } catch (error) {
-  //       console.error("Error fetching events:", error);
-  //     }
-  //   };
-
-  //   console.log(1)
-  //   fetchEvents();
-  // }, []);
+  
+  const [sseConnection, setSseConnection] = useState<EventSource | null>(null);
 
   useEffect(() => {
-    console.log(11)
-    const eventSource = new EventSource(`/api/event-sse?visitorId=V-123123`);
-    eventSource.onopen = (e) => {
-      console.log("SSE connection opened");
+    const initializeSSE = () => {
+      const newSseConnection = new EventSource(`/api/track-event?visitorId=V-123123`);
+      setSseConnection(newSseConnection);
+      
+      newSseConnection.onopen = (e) => {
+        console.log("SSE connection opened");
+      };
+
+      newSseConnection.onmessage = (e) => {
+        const data = JSON.parse(e.data);
+        console.log("New SSE message:", data);
+        if (data.events) {
+          setEvents(data.events);
+        } else if (data.newEvent) {
+          setEvents((prevEvents) => [...prevEvents, data.newEvent]);
+        }
+      };
+
+      newSseConnection.onerror = (e) => {
+        console.error("SSE error:", e);
+        setSseConnection(null);
+      };
     };
 
-    eventSource.onmessage = (e) => {
-      const data = JSON.parse(e.data);
-      console.log("New SSE message:",data);
-      if (data.events) {
-        setEvents(data.events);
-      } else if (data.newEvent) {
-        setEvents((prevEvents) => [...prevEvents, data.newEvent]);
+    
+    initializeSSE();
+
+    
+    const reconnectSSE = () => {
+      if (!sseConnection || sseConnection.readyState === EventSource.CLOSED) {
+        console.log("Reconnecting SSE...");
+        initializeSSE();
       }
     };
 
-    eventSource.onerror = (e) => {
-      console.error("SSE error:", e);
-      eventSource.close();
-    };
+    window.addEventListener("focus", reconnectSSE);
 
     return () => {
-      // eventSource.close();
+      sseConnection?.close(); 
+      window.removeEventListener("focus", reconnectSSE); 
     };
   }, []);
 
   const handleTestConnection = async () => {
+    if (status === "success") {
+      setOpenDropdown("test");
+    } else {
     setStatus("checking");
     try {
       const response = await apiRequest<ApiResponse>(
-      "/test-connection?surfaceId=SURFACE-123123",
-    );
+        "/test-connection?surfaceId=SURFACE-123123"
+      );
     if (response?.status === 200) {
       setStatus("success");
       setButtonStatus((prev) => ({
@@ -84,11 +91,11 @@ export default function MainContent() {
         testDropdown: { buttonDisabled: false },
       }));
     }
-    }catch(e){
+    } catch (e) {
       setStatus("error");
-      console.log('e :>> ', e);
-    }
-  };
+      console.log("Error during test connection: ", e);
+    }}
+  };  
 
   return (
     <div className="flex-1 overflow-y-auto p-[48px] pt-6">
@@ -121,13 +128,14 @@ export default function MainContent() {
                   onClick={handleTestConnection}
                   className="rounded-lg bg-blue-600 px-4 py-1.5 text-[14px] text-white"
                 >
-                  Test connection
+                 {status === "success" ? "Next step" : "Test connection"}
                 </button>
               </div>
             </div>
           }
         />
         <DropDown
+          status={""}
           open={opendropdown === "test"}
           button={
             <button

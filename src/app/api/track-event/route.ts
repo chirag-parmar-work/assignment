@@ -1,8 +1,9 @@
   import { NextRequest, NextResponse } from "next/server";
   import { PrismaClient} from "@prisma/client";
-  import { eventEmitter } from "../event-sse/helper";
+import { EventEmitter } from "stream";
 
   const prisma = new PrismaClient();
+  const eventEmitter = new EventEmitter();
 
   export interface EventMetadata {
     formId?: string;
@@ -138,31 +139,51 @@
       console.log('event emit :>> ');
     };
 
-    export async function GET(request: NextRequest) {
-      try {
-        const userId = request.nextUrl.searchParams.get('userId');
-        if (!userId) {
-          return NextResponse.json({ message: 'User ID is required', status: 400 });
-        }
+   
 
-        const events = await prisma.event.findMany({
-          where: {
-            user: {
-              id: userId
-            }
-          },
-          include: {
-            user: true,
-            visitor: true,
-          },
-          orderBy: {
-            start_date: 'desc'
-          }
-        });
 
-        return NextResponse.json(events);
-      } catch (error) {
-        console.error("Error fetching events:", error instanceof Error ? error.message : String(error));
-        return NextResponse.json({ message: "Failed to fetch events"});
-      }
-    }
+export const runtime = 'nodejs';
+export const dynamic = 'force-dynamic';
+
+const sendData = (writer: any, data: any) => {
+  const formattedData = `data: ${JSON.stringify(data)}\n\n`;
+  writer.write(new TextEncoder().encode(formattedData));
+};
+
+export async function GET(request: NextRequest) {
+  const visitorId = request.nextUrl.searchParams.get('visitorId');
+  if (!visitorId) {
+    return new Response('User ID is required', { status: 400 });
+  }
+
+  const responseStream = new TransformStream();
+  const writer = responseStream.writable.getWriter();
+
+  const initialEvents = await prisma.event.findMany({
+    where: { visitor: { id: visitorId } },
+    include: { visitor: true, user: true },
+  });
+
+  sendData(writer, { events: initialEvents });
+
+  const newEventListener = (event: any) => {
+    console.log(12)
+    sendData(writer, { newEvent: event });
+  };
+
+  eventEmitter.on('newEvent', newEventListener);
+
+  request.signal.addEventListener('abort', () => {
+    console.log('SSE connection closed');
+    eventEmitter.off('newEvent', newEventListener);
+    writer.close();
+  });
+
+  return new Response(responseStream.readable, {
+    headers: {
+      'Content-Type': 'text/event-stream',
+      'Connection': 'keep-alive',
+      'Cache-Control': 'no-cache, no-transform',
+    },
+  });
+}

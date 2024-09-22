@@ -16,7 +16,7 @@ const DropDown: React.FC<{
   title: string;
   description: string;
   content: React.ReactNode;
-  footer: React.ReactNode;
+  footer?: React.ReactNode;
 }> = ({
     open,
     button,
@@ -50,7 +50,7 @@ const DropDown: React.FC<{
      {button}
       </div>
       <div
-        className={`overflow-hidden transition-all duration-300 ease-in-out ${open ? "max-h-[600px] opacity-100" : "max-h-0 opacity-0"}`}
+        className={`overflow-auto transition-all duration-300 ease-in-out ${open ? "max-h-[600px] opacity-100" : "max-h-0 opacity-0"}`}
       >
         {content}
        {footer}
