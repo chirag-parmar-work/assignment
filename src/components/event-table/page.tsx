@@ -1,5 +1,5 @@
 import React from "react";
-import { EventType } from "../HomePage/page";
+import { EventType } from "../home-page/page";
 
 const EventsTable = ({ events }: { events: EventType[] }) => {
   const eventData = events
