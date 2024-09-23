@@ -1,6 +1,4 @@
-"use client";
-import Image from "next/image";
-
+"use client"
 import { CalendarDaysIcon, FolderIcon, FunnelIcon, HomeIcon, UserIcon } from "@heroicons/react/24/outline";
 import { useState } from "react";
 

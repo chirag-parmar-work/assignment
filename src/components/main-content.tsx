@@ -1,11 +1,12 @@
 "use client";
 
 import React, { useEffect, useState, useCallback, useMemo } from "react";
-import DropDown from "./dropdown";
-import EventsTable from "./event-table";
-import { ScriptSnippet } from "./script";
+
 import apiRequest from "~/api";
+import DropDown from "./dropdown";
+import { ScriptSnippet } from "./script";
 import StatusMessage from "./status-message";
+import EventsTable from "./event-table";
 
 interface Event {
   id: string;
@@ -29,47 +30,47 @@ export default function MainContent() {
   const [opendropdown, setOpenDropdown] = useState<string>("");
   const [sseConnection, setSseConnection] = useState<EventSource | null>(null);
 
-  const initializeSSE = useCallback(() => {
-    if (sseConnection) return;
+  // const initializeSSE = useCallback(() => {
+  //   if (sseConnection) return;
 
-    const newSseConnection = new EventSource(`/api/track-event?visitorId=V-123123`);
-    setSseConnection(newSseConnection);
+  //   const newSseConnection = new EventSource(`/api/track-event?visitorId=V-123123`);
+  //   setSseConnection(newSseConnection);
 
-    newSseConnection.onopen = () => console.log("SSE connection opened");
+  //   newSseConnection.onopen = () => console.log("SSE connection opened");
 
-    newSseConnection.onmessage = (e) => {
-      const data = JSON.parse(e.data);
-      if (data.events) {
-        setEvents(data.events);
-      } else if (data.newEvent) {
-        setEvents((prevEvents) => [...prevEvents, data.newEvent]);
-      }
-    };
+  //   newSseConnection.onmessage = (e) => {
+  //     const data = JSON.parse(e.data);
+  //     if (data.events) {
+  //       setEvents(data.events);
+  //     } else if (data.newEvent) {
+  //       setEvents((prevEvents) => [...prevEvents, data.newEvent]);
+  //     }
+  //   };
 
-    newSseConnection.onerror = () => {
-      console.error("SSE error, closing connection");
-      setSseConnection(null);
-    };
-  }, []);
+  //   newSseConnection.onerror = () => {
+  //     console.error("SSE error, closing connection");
+  //     setSseConnection(null);
+  //   };
+  // }, []);
 
-  useEffect(() => {
-    initializeSSE();
+  // useEffect(() => {
+  //   initializeSSE();
 
-    const reconnectSSE = () => {
-      if (!sseConnection || sseConnection.readyState === EventSource.CLOSED) {
-        console.log("Reconnecting SSE...");
-        initializeSSE();
-      }
-    };
+  //   const reconnectSSE = () => {
+  //     if (!sseConnection || sseConnection.readyState === EventSource.CLOSED) {
+  //       console.log("Reconnecting SSE...");
+  //       initializeSSE();
+  //     }
+  //   };
 
-    window.addEventListener("focus", reconnectSSE);
+  //   window.addEventListener("focus", reconnectSSE);
 
-    // Return cleanup function to close the connection when component unmounts
-    return () => {
-      sseConnection?.close(); 
-      window.removeEventListener("focus", reconnectSSE); 
-    };
-  }, [initializeSSE]);
+  //   // Return cleanup function to close the connection when component unmounts
+  //   return () => {
+  //     sseConnection?.close(); 
+  //     window.removeEventListener("focus", reconnectSSE); 
+  //   };
+  // }, [initializeSSE]);
 
   const handleTestConnection = useCallback(async () => {
     if (status === "success") {

@@ -1,6 +1,6 @@
 "use client";
-import React, { useState } from "react";
-import  { AlertCircle, CheckCircle } from "./status-message";
+import React from "react";
+import { AlertCircle, CheckCircle } from "./status-message";
 
 
 const DropDown: React.FC<{
