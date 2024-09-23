@@ -1,6 +1,7 @@
 "use client";
 import {
   CalendarDaysIcon,
+  ClockIcon,
   FolderIcon,
   FunnelIcon,
   HomeIcon,
@@ -64,7 +65,7 @@ const menuItems = [
     name: "Workflows",
     href: "#",
     current: false,
-    icon: <HomeIcon className="mr-4 h-5 w-5" />,
+    icon: <ClockIcon className="mr-4 h-5 w-5" />,
   },
   {
     name: "Integrations",

@@ -166,8 +166,8 @@ export async function GET(request: NextRequest) {
 
   request.signal.addEventListener("abort", () => {
     console.log("SSE connection closed");
-    eventEmitter.off("newEvent", newEventListener);
-    writer.close();
+    // eventEmitter.off("newEvent", newEventListener);
+    // writer.close();
   });
 
   return new Response(responseStream.readable, {

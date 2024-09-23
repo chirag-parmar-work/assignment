@@ -2,10 +2,10 @@
 
 import React, { useEffect, useState, useCallback, useMemo } from "react";
 import EventsTable from "../event-table/page";
-import { ScriptSnippet } from "../script/page";
 import apiRequest from "~/api";
 import StatusMessage from "../status-message/page";
 import DropDown from "../dropdown/page";
+import { ScriptSnippet } from "../script/page";
 
 interface ApiResponse {
   result: {
@@ -145,7 +145,7 @@ export default function MainContent() {
           open={opendropdown === "install"}
           button={installButton}
           status={status}
-          title="Install the Surface Tag"
+          title="Installc the Surface Tag"
           description="Enable tracking and analytics."
           content={<ScriptSnippet />}
           footer={
