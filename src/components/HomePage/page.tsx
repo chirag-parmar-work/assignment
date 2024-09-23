@@ -72,7 +72,6 @@ export default function MainContent() {
 
     window.addEventListener("focus", reconnectSSE);
 
-    // Return cleanup function to close the connection when component unmounts
     return () => {
       sseConnection?.close();
       window.removeEventListener("focus", reconnectSSE);
