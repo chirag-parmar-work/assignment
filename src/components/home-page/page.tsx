@@ -89,6 +89,7 @@ export default function MainContent() {
       const response = await apiRequest<ApiResponse>(
         "/test-connection?surfaceId=SURFACE-123123",
       );
+      console.log("response :>> ", response);
       if (response?.status === 200) {
         setStatus("success");
         setButtonStatus((prev) => ({
