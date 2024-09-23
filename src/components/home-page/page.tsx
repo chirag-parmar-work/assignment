@@ -4,8 +4,8 @@ import React, { useEffect, useState, useCallback, useMemo } from "react";
 import EventsTable from "../event-table/page";
 import apiRequest from "~/api";
 import StatusMessage from "../status-message/page";
-import DropDown from "../dropdown/page";
 import ScriptSnippet from "../script/page";
+import DropDown from "../dropdown/page";
 
 interface ApiResponse {
   result: {
