@@ -167,7 +167,6 @@ export async function GET(request: NextRequest) {
   sendData(writer, { events: initialEvents });
 
   const newEventListener = (event: any) => {
-    console.log(12)
     sendData(writer, { newEvent: event });
   };
 

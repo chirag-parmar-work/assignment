@@ -12,7 +12,7 @@ export async function GET(request: NextRequest) {
     const result = await prisma.user.findUnique({
       where: { surface_id: surfaceId },
     });
-    console.log('result :>> ', result);
+
     if (!result) {
       return NextResponse.json({ message: 'User not found' }, { status: 404 });
     }

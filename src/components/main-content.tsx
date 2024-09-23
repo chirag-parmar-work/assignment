@@ -1,4 +1,5 @@
 "use client";
+
 import React, { useEffect, useState, useCallback, useMemo } from "react";
 import DropDown from "./dropdown";
 import EventsTable from "./event-table";
@@ -28,7 +29,72 @@ export default function MainContent() {
   const [opendropdown, setOpenDropdown] = useState<string>("");
   const [sseConnection, setSseConnection] = useState<EventSource | null>(null);
 
-  
+  const initializeSSE = useCallback(() => {
+    if (sseConnection) return;
+
+    const newSseConnection = new EventSource(`/api/track-event?visitorId=V-123123`);
+    setSseConnection(newSseConnection);
+
+    newSseConnection.onopen = () => console.log("SSE connection opened");
+
+    newSseConnection.onmessage = (e) => {
+      const data = JSON.parse(e.data);
+      if (data.events) {
+        setEvents(data.events);
+      } else if (data.newEvent) {
+        setEvents((prevEvents) => [...prevEvents, data.newEvent]);
+      }
+    };
+
+    newSseConnection.onerror = () => {
+      console.error("SSE error, closing connection");
+      setSseConnection(null);
+    };
+  }, []);
+
+  useEffect(() => {
+    initializeSSE();
+
+    const reconnectSSE = () => {
+      if (!sseConnection || sseConnection.readyState === EventSource.CLOSED) {
+        console.log("Reconnecting SSE...");
+        initializeSSE();
+      }
+    };
+
+    window.addEventListener("focus", reconnectSSE);
+
+    // Return cleanup function to close the connection when component unmounts
+    return () => {
+      sseConnection?.close(); 
+      window.removeEventListener("focus", reconnectSSE); 
+    };
+  }, [initializeSSE]);
+
+  const handleTestConnection = useCallback(async () => {
+    if (status === "success") {
+      setOpenDropdown("test");
+      return;
+    }
+
+    setStatus("checking");
+    try {
+      const response = await apiRequest<ApiResponse>(
+        "/test-connection?surfaceId=SURFACE-123123"
+      );
+      if (response?.status === 200) {
+        setStatus("success");
+        setButtonStatus((prev) => ({
+         ...prev,
+          testDropdown: { buttonDisabled: false },
+        }));
+      }
+    } catch (error) {
+      setStatus("error");
+      console.error("Error during test connection:", error);
+    }
+  }, [status]);
+
   const installButton = useMemo(
     () => (
       <button
@@ -63,76 +129,10 @@ export default function MainContent() {
     [buttonStatus.testDropdown.buttonDisabled, opendropdown]
   );
 
-  
-  const initializeSSE = useCallback(() => {
-    if (sseConnection) return; 
-
-    const newSseConnection = new EventSource(`/api/track-event?visitorId=V-123123`);
-    setSseConnection(newSseConnection);
-
-    newSseConnection.onopen = () => console.log("SSE connection opened");
-
-    newSseConnection.onmessage = (e) => {
-      const data = JSON.parse(e.data);
-      if (data.events) {
-        setEvents(data.events);
-      } else if (data.newEvent) {
-        setEvents((prevEvents) => [...prevEvents, data.newEvent]);
-      }
-    };
-
-    newSseConnection.onerror = () => {
-      console.error("SSE error, closing connection");
-      setSseConnection(null);
-    };
-  }, [sseConnection]);
-
-  useEffect(() => {
-    initializeSSE(); 
-
-    const reconnectSSE = () => {
-      if (!sseConnection || sseConnection.readyState === EventSource.CLOSED) {
-        console.log("Reconnecting SSE...");
-        initializeSSE();
-      }
-    };
-
-    window.addEventListener("focus", reconnectSSE);
-    return () => {
-      sseConnection?.close(); 
-      window.removeEventListener("focus", reconnectSSE); 
-    };
-  }, [initializeSSE, sseConnection]);
-
-  const handleTestConnection = useCallback(async () => {
-    if (status === "success") {
-      setOpenDropdown("test");
-      return;
-    }
-
-    setStatus("checking");
-    try {
-      const response = await apiRequest<ApiResponse>(
-        "/test-connection?surfaceId=SURFACE-123123"
-      );
-      if (response?.status === 200) {
-        setStatus("success");
-        setButtonStatus((prev) => ({
-          ...prev,
-          testDropdown: { buttonDisabled: false },
-        }));
-      }
-    } catch (error) {
-      setStatus("error");
-      console.error("Error during test connection:", error);
-    }
-  }, [status]);
-
   return (
     <div className="flex-1 overflow-y-auto p-[48px] pt-6">
       <h2 className="text-[32px] font-semibold">Getting started</h2>
       <hr className="my-3" />
-
       <div>
         <DropDown
           open={opendropdown === "install"}

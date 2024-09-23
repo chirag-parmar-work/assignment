@@ -53,7 +53,7 @@ const EventsTable = ({ events }: { events: any }) => {
             {eventData.length > 0 &&
               eventData.map((row: any, index: number) => (
                 <tr key={index}>
-                  <td className="whitespace-nowrap px-6 py-4 text-sm font-medium text-gray-900">
+                  <td className="whitespace-nowrap px-6 py-4 text-sm font-small text-gray-500 text-[16px] m leading-[18px] text-left">
                     {row.event}
                   </td>
                   <td className="whitespace-nowrap px-6 py-4 text-sm text-gray-500">
