@@ -1,6 +1,7 @@
   import { NextRequest, NextResponse } from "next/server";
-  import { PrismaClient} from "@prisma/client";
+  import { $Enums, PrismaClient} from "@prisma/client";
 import { EventEmitter } from "stream";
+import { JsonValue } from "@prisma/client/runtime/library";
 
   const prisma = new PrismaClient();
   const eventEmitter = new EventEmitter();
@@ -23,6 +24,52 @@ import { EventEmitter } from "stream";
 
   export async function POST(request: NextRequest) {
 
+     const createEvent = async ({
+      eventName,
+      metadata,
+      visitorId,
+      surfaceId
+    }: {
+      eventName: string;
+      metadata: EventMetadata;
+      visitorId: string;
+      surfaceId: string;
+    }) => {
+      const {
+        description,
+        ...res
+      } = metadata;
+  
+      const _metadata = Object.keys(res).length > 0 ? res : undefined;
+      
+      const data = await prisma.event.create({
+          data: {
+            name: eventName,
+            description,
+            metadata: _metadata,
+            start_date: new Date().toISOString(),
+            user: {
+              connect: {
+                surface_id: surfaceId,
+              },
+            },
+            visitor: {
+              connect: {
+                id: visitorId,
+              },
+            },
+          },
+          include: {
+            user: true,
+            visitor: true,
+          },
+        });
+      
+        
+        eventEmitter.emit('newEvent', data);
+        console.log('event emit :>> ');
+      };
+  
 
     try {
       const { eventName, visitorId, surfaceId, metadata }: EventBody =
@@ -91,61 +138,16 @@ import { EventEmitter } from "stream";
   }
 
 
-  // ============================== Helper Functions ==============================
+  
 
-  export const createEvent = async ({
-    eventName,
-    metadata,
-    visitorId,
-    surfaceId
-  }: {
-    eventName: string;
-    metadata: EventMetadata;
-    visitorId: string;
-    surfaceId: string;
-  }) => {
-    const {
-      description,
-      ...res
-    } = metadata;
-
-    const _metadata = Object.keys(res).length > 0 ? res : undefined;
-    
-    const data = await prisma.event.create({
-        data: {
-          name: eventName,
-          description,
-          metadata: _metadata,
-          start_date: new Date().toISOString(),
-          user: {
-            connect: {
-              surface_id: surfaceId,
-            },
-          },
-          visitor: {
-            connect: {
-              id: visitorId,
-            },
-          },
-        },
-        include: {
-          user: true,
-          visitor: true,
-        },
-      });
-    
-      
-      eventEmitter.emit('newEvent', data);
-      console.log('event emit :>> ');
-    };
-
+  
    
 
 
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
 
-const sendData = (writer: any, data: any) => {
+const sendData = (writer: WritableStreamDefaultWriter<unknown>, data: { events?: ({ visitor: { id: string; name: string | null; company_size: string | null; email: string | null; user_id: string; } | null; user: { id: string; name: string; surface_id: string; status: $Enums.user_status; email: string; }; } & { id: string; name: string; description: string | null; start_date: Date; metadata: JsonValue | null; user_id: string; visitor_id: string | null; })[]; newEvent?: any; }) => {
   const formattedData = `data: ${JSON.stringify(data)}\n\n`;
   writer.write(new TextEncoder().encode(formattedData));
 };
