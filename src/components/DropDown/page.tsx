@@ -27,7 +27,9 @@ const DropDown: React.FC<{
             <p className="font-sm pb-2 text-left text-[18px] leading-[21.48px] tracking-[0.1px]">
               {title}
             </p>
-            <p className="font-light text-gray-500">{description}</p>
+            <p className="font-light tracking-[0.05rem] text-gray-500">
+              {description}
+            </p>
           </div>
         </div>
         {button}

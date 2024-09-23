@@ -4,6 +4,7 @@ import { EventEmitter } from "stream";
 
 const prisma = new PrismaClient();
 const eventEmitter = new EventEmitter();
+eventEmitter.setMaxListeners(1000);
 
 export interface EventMetadata {
   formId?: string;
@@ -134,10 +135,14 @@ export const createEvent = async ({
   console.log("event emit :>> ");
 };
 
+// ============================== SSE ==============================
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
 
-const sendData = (writer: any, data: any) => {
+const sendData = (
+  writer: WritableStreamDefaultWriter<Uint8Array>,
+  data: any,
+) => {
   const formattedData = `data: ${JSON.stringify(data)}\n\n`;
   writer.write(new TextEncoder().encode(formattedData));
 };
@@ -151,30 +156,38 @@ export async function GET(request: NextRequest) {
   const responseStream = new TransformStream();
   const writer = responseStream.writable.getWriter();
 
-  const initialEvents = await prisma.event.findMany({
-    where: { visitor: { id: visitorId } },
-    include: { visitor: true, user: true },
-  });
+  try {
+    const initialEvents = await prisma.event.findMany({
+      where: { visitor: { id: visitorId } },
+      include: { visitor: true, user: true },
+    });
 
-  sendData(writer, { events: initialEvents });
+    sendData(writer, { events: initialEvents });
 
-  const newEventListener = (event: any) => {
-    sendData(writer, { newEvent: event });
-  };
+    const newEventListener = (event: any) => {
+      sendData(writer, { newEvent: event });
+    };
 
-  eventEmitter.on("newEvent", newEventListener);
+    eventEmitter.on("newEvent", newEventListener);
 
-  request.signal.addEventListener("abort", () => {
-    console.log("SSE connection closed");
-    // eventEmitter.off("newEvent", newEventListener);
-    // writer.close();
-  });
+    request.signal.addEventListener("abort", () => {
+      console.log("SSE connection closed");
+      eventEmitter.off("newEvent", newEventListener);
+      writer.close();
+    });
 
-  return new Response(responseStream.readable, {
-    headers: {
-      "Content-Type": "text/event-stream",
-      Connection: "keep-alive",
-      "Cache-Control": "no-cache, no-transform",
-    },
-  });
+    return new Response(responseStream.readable, {
+      headers: {
+        "Content-Type": "text/event-stream",
+        Connection: "keep-alive",
+        "Cache-Control": "no-cache, no-transform",
+      },
+    });
+  } catch (error) {
+    console.error(
+      "Error tracking event:",
+      error instanceof Error ? error.message : String(error),
+    );
+    return NextResponse.json({ message: "Failed to track event", status: 500 });
+  }
 }

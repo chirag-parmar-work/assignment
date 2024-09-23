@@ -1,11 +1,12 @@
 "use client";
 
-import React, { useEffect, useState, useCallback, useMemo } from "react";
+import React, { useState, useCallback, useMemo } from "react";
 import EventsTable from "../event-table/page";
 import apiRequest from "~/api";
 import StatusMessage from "../status-message/page";
 import ScriptSnippet from "../script/page";
 import DropDown from "../dropdown/page";
+import useSSE from "~/hooks/use-sse";
 
 interface ApiResponse {
   result: {
@@ -30,53 +31,11 @@ export default function MainContent() {
     testDropdown: { buttonDisabled: true },
   });
   const [status, setStatus] = useState("");
-  const [events, setEvents] = useState<EventType[]>([]);
   const [opendropdown, setOpenDropdown] = useState<string>("");
-  const [sseConnection, setSseConnection] = useState<EventSource | null>(null);
 
-  const initializeSSE = useCallback(() => {
-    if (sseConnection) return;
-
-    const newSseConnection = new EventSource(
-      `/api/track-event?visitorId=V-123123`,
-    );
-    setSseConnection(newSseConnection);
-
-    newSseConnection.onopen = () => console.log("SSE connection opened");
-
-    newSseConnection.onmessage = (e) => {
-      console.log("SSE message received");
-      const data = JSON.parse(e.data);
-      if (data.events) {
-        setEvents(data.events);
-      } else if (data.newEvent) {
-        setEvents((prevEvents) => [...prevEvents, data.newEvent]);
-      }
-    };
-
-    newSseConnection.onerror = () => {
-      console.error("SSE error, closing connection");
-      setSseConnection(null);
-    };
-  }, []);
-
-  useEffect(() => {
-    initializeSSE();
-
-    const reconnectSSE = () => {
-      if (!sseConnection || sseConnection.readyState === EventSource.CLOSED) {
-        console.log("Reconnecting SSE...");
-        initializeSSE();
-      }
-    };
-
-    window.addEventListener("focus", reconnectSSE);
-
-    return () => {
-      sseConnection?.close();
-      window.removeEventListener("focus", reconnectSSE);
-    };
-  }, [initializeSSE]);
+  const { events } = useSSE(
+    `/api/track-event?visitorId=V-123123`,
+  );
 
   const handleTestConnection = useCallback(async () => {
     if (status === "success") {

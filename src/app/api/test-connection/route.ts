@@ -17,7 +17,7 @@ export async function GET(request: NextRequest) {
       where: { surface_id: surfaceId },
     });
 
-    if (!result) {
+    if (!result || result.status !== "ACTIVE") {
       return NextResponse.json({ message: "User not found" }, { status: 404 });
     }
     return NextResponse.json({ ...result }, { status: 200 });
