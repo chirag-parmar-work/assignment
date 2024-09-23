@@ -15,17 +15,15 @@ async function apiRequest<T>(
       ...options,
     });
 
-
     if (!response.ok) {
       const errorText = await response.text();
       console.log(`API Error: ${response.status} - ${errorText}`);
-    //   throw new Error(`API Error: ${response.status} - ${errorText}`);
+      //   throw new Error(`API Error: ${response.status} - ${errorText}`);
     }
-
 
     return {
       result: await response.json(),
-      status: response.status
+      status: response.status,
     };
   } catch (error) {
     if (error instanceof Error) {
@@ -33,7 +31,7 @@ async function apiRequest<T>(
       throw error;
     } else {
       console.log("An unexpected error occurred during the API request");
-    //   throw new Error("An unexpected error occurred during the API request");
+      //   throw new Error("An unexpected error occurred during the API request");
     }
   }
 }

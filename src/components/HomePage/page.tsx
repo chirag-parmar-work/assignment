@@ -37,13 +37,15 @@ export default function MainContent() {
   const initializeSSE = useCallback(() => {
     if (sseConnection) return;
 
-    const newSseConnection = new EventSource(`/api/track-event?visitorId=V-123123`);
+    const newSseConnection = new EventSource(
+      `/api/track-event?visitorId=V-123123`,
+    );
     setSseConnection(newSseConnection);
 
     newSseConnection.onopen = () => console.log("SSE connection opened");
 
     newSseConnection.onmessage = (e) => {
-      console.log("SSE message received")
+      console.log("SSE message received");
       const data = JSON.parse(e.data);
       if (data.events) {
         setEvents(data.events);
@@ -72,8 +74,8 @@ export default function MainContent() {
 
     // Return cleanup function to close the connection when component unmounts
     return () => {
-      sseConnection?.close(); 
-      window.removeEventListener("focus", reconnectSSE); 
+      sseConnection?.close();
+      window.removeEventListener("focus", reconnectSSE);
     };
   }, [initializeSSE]);
 
@@ -86,12 +88,12 @@ export default function MainContent() {
     setStatus("checking");
     try {
       const response = await apiRequest<ApiResponse>(
-        "/test-connection?surfaceId=SURFACE-123123"
+        "/test-connection?surfaceId=SURFACE-123123",
       );
       if (response?.status === 200) {
         setStatus("success");
         setButtonStatus((prev) => ({
-         ...prev,
+          ...prev,
           testDropdown: { buttonDisabled: false },
         }));
       }
@@ -115,7 +117,7 @@ export default function MainContent() {
         Install tag
       </button>
     ),
-    [buttonStatus.installdropdown.buttonDisabled, opendropdown]
+    [buttonStatus.installdropdown.buttonDisabled, opendropdown],
   );
 
   const testButton = useMemo(
@@ -132,7 +134,7 @@ export default function MainContent() {
         Test tag
       </button>
     ),
-    [buttonStatus.testDropdown.buttonDisabled, opendropdown]
+    [buttonStatus.testDropdown.buttonDisabled, opendropdown],
   );
 
   return (
@@ -172,7 +174,7 @@ export default function MainContent() {
             <div className="p-6">
               <div className="flex justify-end">
                 <button
-                  onClick={()=>{}}
+                  onClick={() => {}}
                   className="rounded-lg bg-blue-600 px-4 py-1.5 text-[14px] text-white"
                 >
                   Test teg

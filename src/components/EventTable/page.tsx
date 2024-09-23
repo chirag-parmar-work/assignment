@@ -1,7 +1,7 @@
 import React from "react";
 import { EventType } from "../HomePage/page";
 
-const EventsTable = ({ events }: { events:EventType[] }) => {
+const EventsTable = ({ events }: { events: EventType[] }) => {
   const eventData = events
     .filter(
       (event: EventType, index: number, self: EventType[]) =>
@@ -54,7 +54,7 @@ const EventsTable = ({ events }: { events:EventType[] }) => {
             {eventData.length > 0 &&
               eventData.map((row, index: number) => (
                 <tr key={index}>
-                  <td className="whitespace-nowrap px-6 py-4 text-sm font-small text-gray-500 text-[16px] m leading-[18px] text-left">
+                  <td className="font-small m whitespace-nowrap px-6 py-4 text-left text-[16px] text-sm leading-[18px] text-gray-500">
                     {row.event}
                   </td>
                   <td className="whitespace-nowrap px-6 py-4 text-sm text-gray-500">
