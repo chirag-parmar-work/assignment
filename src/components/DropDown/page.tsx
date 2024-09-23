@@ -1,6 +1,6 @@
 "use client";
 import React from "react";
-import { AlertCircle, CheckCircle } from "../StatusMessage/page";
+import { AlertCircle, CheckCircle } from "../status-message/page";
 
 const DropDown: React.FC<{
   open: boolean;

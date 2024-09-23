@@ -1,11 +1,11 @@
 "use client";
 
 import React, { useEffect, useState, useCallback, useMemo } from "react";
-import EventsTable from "../EventTable/page";
-import { ScriptSnippet } from "../Script/page";
+import EventsTable from "../event-table/page";
+import { ScriptSnippet } from "../script/page";
 import apiRequest from "~/api";
-import StatusMessage from "../StatusMessage/page";
-import DropDown from "../DropDown/page";
+import StatusMessage from "../status-message/page";
+import DropDown from "../dropdown/page";
 
 interface ApiResponse {
   result: {
