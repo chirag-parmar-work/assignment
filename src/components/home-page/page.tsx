@@ -33,9 +33,7 @@ export default function MainContent() {
   const [status, setStatus] = useState("");
   const [opendropdown, setOpenDropdown] = useState<string>("");
 
-  const { events } = useSSE(
-    `/api/track-event?visitorId=V-123123`,
-  );
+  const { events } = useSSE(`/api/track-event?visitorId=V-123123`);
 
   const handleTestConnection = useCallback(async () => {
     if (status === "success") {
@@ -105,7 +103,7 @@ export default function MainContent() {
           open={opendropdown === "install"}
           button={installButton}
           status={status}
-          title="Installc the Surface Tag"
+          title="Install the Surface Tag"
           description="Enable tracking and analytics."
           content={<ScriptSnippet />}
           footer={
